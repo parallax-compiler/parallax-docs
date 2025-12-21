@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Start - Parallax</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/docs.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">
+                    <span class="terminal-prompt">~$</span> Parallax
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html#features">Features</a>
+                <a href="quickstart.html">Quick Start</a>
+                <a href="api.html">API</a>
+                <a href="examples.html">Examples</a>
+                <a href="https://github.com/parallax-compiler" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="docs-container">
+        <aside class="docs-sidebar">
+            <nav class="docs-nav">
+                <div class="nav-section">
+                    <h3>Getting Started</h3>
+                    <a href="quickstart.html" class="active">Quick Start</a>
+                    <a href="installation.html">Installation</a>
+                    <a href="first-app.html">First Application</a>
+                </div>
+                <div class="nav-section">
+                    <h3>API Reference</h3>
+                    <a href="api.html">Overview</a>
+                    <a href="api-memory.html">Memory Management</a>
+                    <a href="api-kernels.html">Kernel Execution</a>
+                </div>
+                <div class="nav-section">
+                    <h3>Examples</h3>
+                    <a href="examples.html">All Examples</a>
+                    <a href="example-vector.html">Vector Operations</a>
+                    <a href="example-matrix.html">Matrix Multiply</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="docs-content">
+            <h1>Quick Start</h1>
+            <p class="lead">Get up and running with Parallax in 5 minutes</p>
+
+            <section class="doc-section">
+                <h2>Prerequisites</h2>
+                <div class="info-box">
+                    <ul>
+                        <li><strong>CMake</strong> 3.20 or higher</li>
+                        <li><strong>C++20 compiler</strong> (GCC 11+, Clang 14+, MSVC 2022+)</li>
+                        <li><strong>Vulkan SDK</strong> 1.2 or higher</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Installation</h2>
+
+                <h3>1. Install Vulkan SDK</h3>
+                <div class="terminal-block">
+                    <div class="terminal-header">
+                        <span class="terminal-button red"></span>
+                        <span class="terminal-button yellow"></span>
+                        <span class="terminal-button green"></span>
+                        <span class="terminal-title">terminal</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><code class="language-bash"># Ubuntu/Debian
+sudo apt install vulkan-sdk
+
+# macOS
+brew install molten-vk vulkan-loader
+
+# Windows
+# Download from https://vulkan.lunarg.com/</code></pre>
+                    </div>
+                </div>
+
+                <h3>2. Clone and Build</h3>
+                <div class="terminal-block">
+                    <div class="terminal-header">
+                        <span class="terminal-button red"></span>
+                        <span class="terminal-button yellow"></span>
+                        <span class="terminal-button green"></span>
+                        <span class="terminal-title">terminal</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><code class="language-bash">git clone https://github.com/parallax-compiler/parallax-runtime.git
+cd parallax-runtime
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$(nproc)
+sudo make install</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Your First Program</h2>
+
+                <p>Create a file called <code>hello_parallax.cpp</code>:</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <span class="code-file">hello_parallax.cpp</span>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;parallax/runtime.h&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int main() {
+    const size_t N = 1'000'000;
+    
+    // Allocate unified memory (accessible from CPU and GPU)
+    float* data = (float*)parallax_umalloc(N * sizeof(float), 0);
+    
+    // Initialize on CPU
+    for (size_t i = 0; i < N; i++) {
+        data[i] = static_cast&lt;float&gt;(i);
+    }
+    
+    // Sync to GPU
+    parallax_sync(data, 0); // 0 = HOST_TO_DEVICE
+    
+    // GPU computation would happen here
+    // For now, we'll just sync back
+    
+    // Sync from GPU
+    parallax_sync(data, 1); // 1 = DEVICE_TO_HOST
+    
+    // Verify
+    std::cout << "First element: " << data[0] << std::endl;
+    std::cout << "Last element: " << data[N-1] << std::endl;
+    
+    // Cleanup
+    parallax_ufree(data);
+    
+    return 0;
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Compile and Run</h2>
+
+                <div class="terminal-block">
+                    <div class="terminal-header">
+                        <span class="terminal-button red"></span>
+                        <span class="terminal-button yellow"></span>
+                        <span class="terminal-button green"></span>
+                        <span class="terminal-title">terminal</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><code class="language-bash">g++ -std=c++20 hello_parallax.cpp -lparallax-runtime -o hello
+./hello</code></pre>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <strong>✓ Success!</strong> You've just run your first Parallax application.
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Next Steps</h2>
+
+                <div class="next-steps">
+                    <a href="api.html" class="next-step-card">
+                        <h3>📚 API Reference</h3>
+                        <p>Explore the complete API documentation</p>
+                    </a>
+                    <a href="examples.html" class="next-step-card">
+                        <h3>💡 Examples</h3>
+                        <p>Learn from working code examples</p>
+                    </a>
+                    <a href="https://github.com/parallax-compiler/parallax-runtime" class="next-step-card">
+                        <h3>🔧 Contribute</h3>
+                        <p>Join the development on GitHub</p>
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+
+</html>

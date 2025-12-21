@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallax - Universal GPU Acceleration for C++</title>
+    <meta name="description" content="Zero-code-change GPU acceleration for C++ Standard Parallel Algorithms via Vulkan">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <span class="terminal-prompt">~$</span> Parallax
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="docs/quickstart.html">Quick Start</a>
+                <a href="docs/api.html">API</a>
+                <a href="docs/examples.html">Examples</a>
+                <a href="https://github.com/parallax-compiler" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="glitch" data-text="Parallax">Parallax</h1>
+                <p class="tagline">Universal GPU Acceleration for C++ Parallel Algorithms</p>
+                <p class="subtitle">Zero code changes. Any GPU. Pure Vulkan.</p>
+                
+                <div class="cta-buttons">
+                    <a href="docs/quickstart.html" class="btn btn-primary">Get Started</a>
+                    <a href="https://github.com/parallax-compiler/parallax-runtime" class="btn btn-secondary" target="_blank">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        View on GitHub
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-terminal">
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <span class="terminal-button red"></span>
+                        <span class="terminal-button yellow"></span>
+                        <span class="terminal-button green"></span>
+                        <span class="terminal-title">parallax_demo.cpp</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><code class="language-cpp">// Your existing C++ code - unchanged
+std::vector&lt;float&gt; data(1'000'000, 1.0f);
+
+std::for_each(std::execution::par, 
+              data.begin(), data.end(),
+              [](float& x) { x *= 2.0f; });
+
+// With Parallax: Runs on GPU automatically
+// AMD, NVIDIA, Intel - anything with Vulkan</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Why Parallax?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Universal</h3>
+                    <p>Works on AMD, NVIDIA, Intel, Qualcomm, ARM Mali - any GPU with Vulkan 1.2+</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Zero Overhead</h3>
+                    <p>Direct Vulkan compute. No translation layers, no runtime interpretation</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Smart Memory</h3>
+                    <p>Unified memory with automatic host-device synchronization</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔓</div>
+                    <h3>Open Source</h3>
+                    <p>Apache 2.0 licensed. Community-driven development</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="performance">
+        <div class="container">
+            <h2>Performance</h2>
+            <p class="section-subtitle">Early benchmarks on vector operations (1M elements)</p>
+            
+            <div class="benchmark-grid">
+                <div class="benchmark-card">
+                    <div class="benchmark-label">CPU (12-core)</div>
+                    <div class="benchmark-bar" style="width: 100%;">
+                        <span>85ms</span>
+                    </div>
+                </div>
+                <div class="benchmark-card">
+                    <div class="benchmark-label">NVIDIA RTX 4090</div>
+                    <div class="benchmark-bar speedup" style="width: 2.5%;">
+                        <span>2.1ms</span>
+                    </div>
+                    <div class="speedup-badge">40x faster</div>
+                </div>
+                <div class="benchmark-card">
+                    <div class="benchmark-label">AMD RX 7900 XTX</div>
+                    <div class="benchmark-bar speedup" style="width: 3.3%;">
+                        <span>2.8ms</span>
+                    </div>
+                    <div class="speedup-badge">30x faster</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="architecture">
+        <div class="container">
+            <h2>Architecture</h2>
+            <div class="arch-diagram">
+                <div class="arch-layer">
+                    <div class="arch-box">C++ Application (std::execution)</div>
+                </div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-layer">
+                    <div class="arch-box highlight">Parallax Runtime (C ABI)</div>
+                </div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-layer">
+                    <div class="arch-box">Vulkan Compute Backend</div>
+                </div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-layer">
+                    <div class="arch-box">GPU Driver (AMD, NVIDIA, Intel, etc.)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to accelerate your C++ code?</h2>
+            <a href="docs/quickstart.html" class="btn btn-primary btn-large">Get Started Now</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Parallax</h4>
+                    <p>Universal GPU acceleration for C++</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <a href="docs/quickstart.html">Quick Start</a>
+                    <a href="docs/api.html">API Reference</a>
+                    <a href="docs/examples.html">Examples</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Community</h4>
+                    <a href="https://github.com/parallax-compiler" target="_blank">GitHub</a>
+                    <a href="https://twitter.com/ParallaxCompiler" target="_blank">Twitter</a>
+                    <a href="https://github.com/parallax-compiler/parallax-runtime/discussions" target="_blank">Discussions</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Parallax Contributors. Apache 2.0 License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
