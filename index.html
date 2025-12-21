@@ -60,12 +60,13 @@
                         <pre><code class="language-cpp">// Your existing C++ code - unchanged
 std::vector&lt;float&gt; data(1'000'000, 1.0f);
 
+// Just use std::execution::par - Parallax handles the rest
 std::for_each(std::execution::par, 
               data.begin(), data.end(),
               [](float& x) { x *= 2.0f; });
 
-// With Parallax: Runs on GPU automatically
-// AMD, NVIDIA, Intel - anything with Vulkan</code></pre>
+// Memory coherence is automatic - no sync needed!
+// Works on AMD, NVIDIA, Intel - anything with Vulkan</code></pre>
                     </div>
                 </div>
             </div>

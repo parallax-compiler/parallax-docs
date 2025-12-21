@@ -120,36 +120,28 @@ sudo make install</code></pre>
                         <span class="code-lang">C++</span>
                         <span class="code-file">hello_parallax.cpp</span>
                     </div>
-                    <pre><code class="language-cpp">#include &lt;parallax/runtime.h&gt;
-#include &lt;iostream&gt;
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;execution&gt;
 
 int main() {
-    const size_t N = 1'000'000;
+    std::vector&lt;float&gt; data(1'000'000);
     
-    // Allocate unified memory (accessible from CPU and GPU)
-    float* data = (float*)parallax_umalloc(N * sizeof(float), 0);
-    
-    // Initialize on CPU
-    for (size_t i = 0; i < N; i++) {
+    // Initialize
+    for (size_t i = 0; i < data.size(); i++) {
         data[i] = static_cast&lt;float&gt;(i);
     }
     
-    // Sync to GPU
-    parallax_sync(data, 0); // 0 = HOST_TO_DEVICE
+    // GPU acceleration with std::execution::par
+    // Parallax automatically handles memory coherence
+    std::for_each(std::execution::par,
+                  data.begin(), data.end(),
+                  [](float& x) { x *= 2.0f; });
     
-    // GPU computation would happen here
-    // For now, we'll just sync back
-    
-    // Sync from GPU
-    parallax_sync(data, 1); // 1 = DEVICE_TO_HOST
-    
-    // Verify
-    std::cout << "First element: " << data[0] << std::endl;
-    std::cout << "Last element: " << data[N-1] << std::endl;
-    
-    // Cleanup
-    parallax_ufree(data);
+    // Use results immediately - coherence is automatic!
+    std::cout &lt;&lt; "First element: " &lt;&lt; data[0] &lt;&lt; std::endl;
+    std::cout &lt;&lt; "Last element: " &lt;&lt; data.back() &lt;&lt; std::endl;
     
     return 0;
 }</code></pre>
