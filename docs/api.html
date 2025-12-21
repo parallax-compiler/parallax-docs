@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference - Parallax</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/docs.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">
+                    <span class="terminal-prompt">~$</span> Parallax
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html#features">Features</a>
+                <a href="quickstart.html">Quick Start</a>
+                <a href="api.html">API</a>
+                <a href="examples.html">Examples</a>
+                <a href="https://github.com/parallax-compiler" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="docs-container">
+        <aside class="docs-sidebar">
+            <nav class="docs-nav">
+                <div class="nav-section">
+                    <h3>Getting Started</h3>
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="installation.html">Installation</a>
+                    <a href="first-app.html">First Application</a>
+                </div>
+                <div class="nav-section">
+                    <h3>API Reference</h3>
+                    <a href="api.html" class="active">Overview</a>
+                    <a href="api-memory.html">Memory Management</a>
+                    <a href="api-kernels.html">Kernel Execution</a>
+                </div>
+                <div class="nav-section">
+                    <h3>Examples</h3>
+                    <a href="examples.html">All Examples</a>
+                    <a href="example-vector.html">Vector Operations</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="docs-content">
+            <h1>API Reference</h1>
+            <p class="lead">Complete reference for the Parallax runtime API</p>
+
+            <section class="doc-section">
+                <h2>Overview</h2>
+                <p>The Parallax runtime provides a simple C API for GPU-accelerated computing. The API is designed to be
+                    minimal and easy to integrate into existing C++ applications.</p>
+
+                <div class="info-box">
+                    <strong>Header:</strong> <code>#include &lt;parallax/runtime.h&gt;</code><br>
+                    <strong>Library:</strong> <code>-lparallax-runtime</code>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Core Functions</h2>
+
+                <h3>Memory Management</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C</span>
+                        <span class="code-file">parallax/runtime.h</span>
+                    </div>
+                    <pre><code class="language-c">void* parallax_umalloc(size_t size, unsigned flags);
+void parallax_ufree(void* ptr);
+void parallax_sync(void* ptr, int direction);</code></pre>
+                </div>
+
+                <p><strong>parallax_umalloc</strong> - Allocate unified memory accessible from both CPU and GPU</p>
+                <ul>
+                    <li><code>size</code>: Size in bytes to allocate</li>
+                    <li><code>flags</code>: Reserved for future use (pass 0)</li>
+                    <li>Returns: Pointer to allocated memory, or NULL on failure</li>
+                </ul>
+
+                <p><strong>parallax_ufree</strong> - Free unified memory</p>
+                <ul>
+                    <li><code>ptr</code>: Pointer previously returned by parallax_umalloc</li>
+                </ul>
+
+                <p><strong>parallax_sync</strong> - Synchronize memory between host and device</p>
+                <ul>
+                    <li><code>ptr</code>: Pointer to unified memory</li>
+                    <li><code>direction</code>: 0 for HOST_TO_DEVICE, 1 for DEVICE_TO_HOST</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>Note:</strong> Memory allocated with <code>parallax_umalloc</code> is automatically
+                    synchronized when needed. Explicit <code>parallax_sync</code> calls are only required for
+                    performance optimization.
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Example Usage</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <span class="code-file">example.cpp</span>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;parallax/runtime.h&gt;
+
+int main() {
+    // Allocate 1MB of unified memory
+    float* data = (float*)parallax_umalloc(1024 * 1024 * sizeof(float), 0);
+    
+    // Initialize on CPU
+    for (size_t i = 0; i < 1024 * 1024; i++) {
+        data[i] = i;
+    }
+    
+    // Sync to GPU
+    parallax_sync(data, 0);
+    
+    // GPU computation happens here
+    
+    // Sync back to CPU
+    parallax_sync(data, 1);
+    
+    // Cleanup
+    parallax_ufree(data);
+    return 0;
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>See Also</h2>
+                <div class="next-steps">
+                    <a href="api-memory.html" class="next-step-card">
+                        <h3>Memory Management</h3>
+                        <p>Detailed memory API documentation</p>
+                    </a>
+                    <a href="api-kernels.html" class="next-step-card">
+                        <h3>Kernel Execution</h3>
+                        <p>GPU kernel launch API</p>
+                    </a>
+                    <a href="examples.html" class="next-step-card">
+                        <h3>Examples</h3>
+                        <p>Working code examples</p>
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+
+</html>

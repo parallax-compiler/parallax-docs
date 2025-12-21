@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kernel Execution API - Parallax</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/docs.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">
+                    <span class="terminal-prompt">~$</span> Parallax
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html#features">Features</a>
+                <a href="quickstart.html">Quick Start</a>
+                <a href="api.html">API</a>
+                <a href="examples.html">Examples</a>
+                <a href="https://github.com/parallax-compiler" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="docs-container">
+        <aside class="docs-sidebar">
+            <nav class="docs-nav">
+                <div class="nav-section">
+                    <h3>Getting Started</h3>
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="installation.html">Installation</a>
+                    <a href="first-app.html">First Application</a>
+                </div>
+                <div class="nav-section">
+                    <h3>API Reference</h3>
+                    <a href="api.html">Overview</a>
+                    <a href="api-memory.html">Memory Management</a>
+                    <a href="api-kernels.html" class="active">Kernel Execution</a>
+                </div>
+                <div class="nav-section">
+                    <h3>Examples</h3>
+                    <a href="examples.html">All Examples</a>
+                    <a href="example-vector.html">Vector Operations</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="docs-content">
+            <h1>Kernel Execution API</h1>
+            <p class="lead">GPU kernel loading and execution (Coming Soon)</p>
+
+            <section class="doc-section">
+                <h2>Overview</h2>
+                <p>The kernel execution API allows you to load and run SPIR-V compute shaders on the GPU.</p>
+
+                <div class="info-box">
+                    <strong>Note:</strong> This API is currently under development. Check back soon for updates.
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Planned API</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C</span>
+                    </div>
+                    <pre><code class="language-c">// Load SPIR-V kernel
+parallax_kernel_t parallax_kernel_load(const unsigned int* spirv, size_t words);
+
+// Launch kernel
+void parallax_kernel_launch(parallax_kernel_t kernel, void* buffer, size_t count);
+
+// Cleanup
+void parallax_kernel_destroy(parallax_kernel_t kernel);</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>See Also</h2>
+                <ul>
+                    <li><a href="api-memory.html">Memory Management</a></li>
+                    <li><a href="examples.html">Examples</a></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <script src="../assets/js/main.js"></script>
+</body>
+
+</html>

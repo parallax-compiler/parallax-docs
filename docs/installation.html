@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installation - Parallax</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/docs.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">
+                    <span class="terminal-prompt">~$</span> Parallax
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html#features">Features</a>
+                <a href="quickstart.html">Quick Start</a>
+                <a href="api.html">API</a>
+                <a href="examples.html">Examples</a>
+                <a href="https://github.com/parallax-compiler" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="docs-container">
+        <aside class="docs-sidebar">
+            <nav class="docs-nav">
+                <div class="nav-section">
+                    <h3>Getting Started</h3>
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="installation.html" class="active">Installation</a>
+                    <a href="first-app.html">First Application</a>
+                </div>
+                <div class="nav-section">
+                    <h3>API Reference</h3>
+                    <a href="api.html">Overview</a>
+                    <a href="api-memory.html">Memory Management</a>
+                    <a href="api-kernels.html">Kernel Execution</a>
+                </div>
+                <div class="nav-section">
+                    <h3>Examples</h3>
+                    <a href="examples.html">All Examples</a>
+                    <a href="example-vector.html">Vector Operations</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="docs-content">
+            <h1>Installation</h1>
+            <p class="lead">Platform-specific installation instructions</p>
+
+            <section class="doc-section">
+                <h2>Ubuntu / Debian</h2>
+                <div class="terminal-block">
+                    <div class="terminal-header">
+                        <span class="terminal-button red"></span>
+                        <span class="terminal-button yellow"></span>
+                        <span class="terminal-button green"></span>
+                        <span class="terminal-title">terminal</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><code class="language-bash"># Install dependencies
+sudo apt update
+sudo apt install -y cmake g++ vulkan-sdk
+
+# Clone and build
+git clone https://github.com/parallax-compiler/parallax-runtime.git
+cd parallax-runtime
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$(nproc)
+sudo make install</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Arch Linux</h2>
+                <div class="terminal-block">
+                    <div class="terminal-header">
+                        <span class="terminal-button red"></span>
+                        <span class="terminal-button yellow"></span>
+                        <span class="terminal-button green"></span>
+                        <span class="terminal-title">terminal</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><code class="language-bash"># Install dependencies
+sudo pacman -S cmake gcc vulkan-headers vulkan-icd-loader
+
+# Clone and build
+git clone https://github.com/parallax-compiler/parallax-runtime.git
+cd parallax-runtime
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$(nproc)
+sudo make install</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>macOS</h2>
+                <div class="terminal-block">
+                    <div class="terminal-header">
+                        <span class="terminal-button red"></span>
+                        <span class="terminal-button yellow"></span>
+                        <span class="terminal-button green"></span>
+                        <span class="terminal-title">terminal</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><code class="language-bash"># Install dependencies
+brew install cmake molten-vk vulkan-loader
+
+# Clone and build
+git clone https://github.com/parallax-compiler/parallax-runtime.git
+cd parallax-runtime
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$(sysctl -n hw.ncpu)
+sudo make install</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Windows</h2>
+                <div class="info-box">
+                    <ol>
+                        <li>Download and install <a href="https://vulkan.lunarg.com/" target="_blank">Vulkan SDK</a>
+                        </li>
+                        <li>Install Visual Studio 2022 with C++ tools</li>
+                        <li>Clone the repository</li>
+                        <li>Open CMake GUI and configure</li>
+                        <li>Build with Visual Studio</li>
+                    </ol>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Verify Installation</h2>
+                <div class="terminal-block">
+                    <div class="terminal-header">
+                        <span class="terminal-button red"></span>
+                        <span class="terminal-button yellow"></span>
+                        <span class="terminal-button green"></span>
+                        <span class="terminal-title">terminal</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><code class="language-bash"># Check if library is installed
+ldconfig -p | grep parallax
+
+# Run test
+cd parallax-runtime/build/tests
+./test_vulkan_backend</code></pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+
+</html>

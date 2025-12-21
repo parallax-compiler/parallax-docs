@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Management API - Parallax</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/docs.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">
+                    <span class="terminal-prompt">~$</span> Parallax
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html#features">Features</a>
+                <a href="quickstart.html">Quick Start</a>
+                <a href="api.html">API</a>
+                <a href="examples.html">Examples</a>
+                <a href="https://github.com/parallax-compiler" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="docs-container">
+        <aside class="docs-sidebar">
+            <nav class="docs-nav">
+                <div class="nav-section">
+                    <h3>Getting Started</h3>
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="installation.html">Installation</a>
+                    <a href="first-app.html">First Application</a>
+                </div>
+                <div class="nav-section">
+                    <h3>API Reference</h3>
+                    <a href="api.html">Overview</a>
+                    <a href="api-memory.html" class="active">Memory Management</a>
+                    <a href="api-kernels.html">Kernel Execution</a>
+                </div>
+                <div class="nav-section">
+                    <h3>Examples</h3>
+                    <a href="examples.html">All Examples</a>
+                    <a href="example-vector.html">Vector Operations</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="docs-content">
+            <h1>Memory Management API</h1>
+            <p class="lead">Unified memory allocation and synchronization</p>
+
+            <section class="doc-section">
+                <h2>Overview</h2>
+                <p>Parallax uses unified memory that is accessible from both CPU and GPU. This eliminates the need for
+                    manual memory transfers in most cases.</p>
+            </section>
+
+            <section class="doc-section">
+                <h2>Functions</h2>
+
+                <h3>parallax_umalloc</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C</span>
+                    </div>
+                    <pre><code class="language-c">void* parallax_umalloc(size_t size, unsigned flags);</code></pre>
+                </div>
+                <p>Allocates unified memory accessible from both CPU and GPU.</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>size</code>: Number of bytes to allocate</li>
+                    <li><code>flags</code>: Reserved for future use (pass 0)</li>
+                </ul>
+                <p><strong>Returns:</strong> Pointer to allocated memory, or NULL on failure</p>
+
+                <h3>parallax_ufree</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C</span>
+                    </div>
+                    <pre><code class="language-c">void parallax_ufree(void* ptr);</code></pre>
+                </div>
+                <p>Frees memory previously allocated with <code>parallax_umalloc</code>.</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>ptr</code>: Pointer returned by parallax_umalloc</li>
+                </ul>
+
+                <h3>parallax_sync</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C</span>
+                    </div>
+                    <pre><code class="language-c">void parallax_sync(void* ptr, int direction);</code></pre>
+                </div>
+                <p>Explicitly synchronizes memory between host and device.</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>ptr</code>: Pointer to unified memory</li>
+                    <li><code>direction</code>: 0 = HOST_TO_DEVICE, 1 = DEVICE_TO_HOST</li>
+                </ul>
+            </section>
+
+            <section class="doc-section">
+                <h2>Example</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                    </div>
+                    <pre><code class="language-cpp">// Allocate
+float* data = (float*)parallax_umalloc(1000 * sizeof(float), 0);
+
+// Use on CPU
+for (int i = 0; i < 1000; i++) {
+    data[i] = i * 2.0f;
+}
+
+// Sync to GPU
+parallax_sync(data, 0);
+
+// GPU work happens here
+
+// Sync back
+parallax_sync(data, 1);
+
+// Free
+parallax_ufree(data);</code></pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+
+</html>

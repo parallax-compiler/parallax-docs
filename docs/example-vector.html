@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector Operations Example - Parallax</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/docs.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">
+                    <span class="terminal-prompt">~$</span> Parallax
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html#features">Features</a>
+                <a href="quickstart.html">Quick Start</a>
+                <a href="api.html">API</a>
+                <a href="examples.html">Examples</a>
+                <a href="https://github.com/parallax-compiler" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="docs-container">
+        <aside class="docs-sidebar">
+            <nav class="docs-nav">
+                <div class="nav-section">
+                    <h3>Getting Started</h3>
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="installation.html">Installation</a>
+                    <a href="first-app.html">First Application</a>
+                </div>
+                <div class="nav-section">
+                    <h3>API Reference</h3>
+                    <a href="api.html">Overview</a>
+                    <a href="api-memory.html">Memory Management</a>
+                    <a href="api-kernels.html">Kernel Execution</a>
+                </div>
+                <div class="nav-section">
+                    <h3>Examples</h3>
+                    <a href="examples.html">All Examples</a>
+                    <a href="example-vector.html" class="active">Vector Operations</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="docs-content">
+            <h1>Vector Operations Example</h1>
+            <p class="lead">GPU-accelerated vector multiply demonstration</p>
+
+            <section class="doc-section">
+                <h2>Overview</h2>
+                <p>This example demonstrates basic vector operations using Parallax unified memory.</p>
+            </section>
+
+            <section class="doc-section">
+                <h2>Complete Code</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <span class="code-file">vector_multiply.cpp</span>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;parallax/runtime.h&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int main() {
+    const size_t N = 1'000'000;
+    const float multiplier = 2.0f;
+    
+    // Allocate unified memory
+    float* input = (float*)parallax_umalloc(N * sizeof(float), 0);
+    float* output = (float*)parallax_umalloc(N * sizeof(float), 0);
+    
+    // Initialize input
+    for (size_t i = 0; i < N; i++) {
+        input[i] = static_cast&lt;float&gt;(i);
+    }
+    
+    // Sync to GPU
+    parallax_sync(input, 0);
+    
+    // GPU computation would happen here
+    // For now, simulate with CPU
+    for (size_t i = 0; i < N; i++) {
+        output[i] = input[i] * multiplier;
+    }
+    
+    // Sync back
+    parallax_sync(output, 1);
+    
+    // Verify
+    std::cout << "First: " << output[0] << std::endl;
+    std::cout << "Last: " << output[N-1] << std::endl;
+    
+    // Cleanup
+    parallax_ufree(input);
+    parallax_ufree(output);
+    
+    return 0;
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Build and Run</h2>
+                <div class="terminal-block">
+                    <div class="terminal-header">
+                        <span class="terminal-button red"></span>
+                        <span class="terminal-button yellow"></span>
+                        <span class="terminal-button green"></span>
+                        <span class="terminal-title">terminal</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><code class="language-bash">g++ -std=c++20 vector_multiply.cpp -lparallax-runtime -o vector_multiply
+./vector_multiply</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Source Code</h2>
+                <p>Full source available at: <a
+                        href="https://github.com/parallax-compiler/parallax-samples/tree/main/basic"
+                        target="_blank">parallax-samples/basic</a></p>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+
+</html>
