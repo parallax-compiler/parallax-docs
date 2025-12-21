@@ -92,20 +92,23 @@
                 <ul>
                     <li><code>ptr</code>: Pointer returned by parallax_umalloc</li>
                 </ul>
+            </section>
 
-                <h3>parallax_sync</h3>
-                <div class="code-block">
-                    <div class="code-header">
-                        <span class="code-lang">C</span>
-                    </div>
-                    <pre><code class="language-c">void parallax_sync(void* ptr, int direction);</code></pre>
+            <section class="doc-section">
+                <h2>Automatic Coherence</h2>
+                <p>Parallax uses <strong>software-defined unified memory</strong> with block-level dirty tracking (4KB
+                    blocks). Memory coherence is maintained automatically by the runtime - no explicit synchronization
+                    needed!</p>
+
+                <div class="info-box">
+                    <strong>How it works:</strong>
+                    <ul>
+                        <li>Runtime tracks which blocks are modified on CPU vs GPU</li>
+                        <li>Dirty blocks are transferred automatically before kernel execution</li>
+                        <li>Results are available immediately after algorithm completes</li>
+                        <li>No hardware page faults required - works on any Vulkan device</li>
+                    </ul>
                 </div>
-                <p>Explicitly synchronizes memory between host and device.</p>
-                <p><strong>Parameters:</strong></p>
-                <ul>
-                    <li><code>ptr</code>: Pointer to unified memory</li>
-                    <li><code>direction</code>: 0 = HOST_TO_DEVICE, 1 = DEVICE_TO_HOST</li>
-                </ul>
             </section>
 
             <section class="doc-section">
@@ -114,24 +117,21 @@
                     <div class="code-header">
                         <span class="code-lang">C++</span>
                     </div>
-                    <pre><code class="language-cpp">// Allocate
-float* data = (float*)parallax_umalloc(1000 * sizeof(float), 0);
+                    <pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;execution&gt;
 
-// Use on CPU
-for (int i = 0; i < 1000; i++) {
-    data[i] = i * 2.0f;
-}
-
-// Sync to GPU
-parallax_sync(data, 0);
-
-// GPU work happens here
-
-// Sync back
-parallax_sync(data, 1);
-
-// Free
-parallax_ufree(data);</code></pre>
+int main() {
+    std::vector&lt;float&gt; data(1'000'000, 1.0f);
+    
+    // GPU acceleration with automatic coherence
+    std::for_each(std::execution::par,
+                  data.begin(), data.end(),
+                  [](float& x) { x *= 2.0f; });
+    
+    // Results immediately available - no sync needed!
+    return 0;
+}</code></pre>
                 </div>
             </section>
         </main>
