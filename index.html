@@ -57,15 +57,15 @@
                         <span class="terminal-title">parallax_demo.cpp</span>
                     </div>
                     <div class="terminal-body">
-                        <pre><code class="language-cpp">// Your existing C++ code - unchanged
-std::vector&lt;float&gt; data(1'000'000, 1.0f);
+                        <pre><code class="language-cpp">// Use parallax::allocator for GPU-accessible memory
+std::vector&lt;float, parallax::allocator&lt;float&gt;&gt; data(1'000'000, 1.0f);
 
-// Just use std::execution::par - Parallax handles the rest
-std::for_each(std::execution::par, 
+// Just use std::execution::par - runs on GPU automatically!
+std::for_each(std::execution::par,
               data.begin(), data.end(),
               [](float& x) { x *= 2.0f; });
 
-// Memory coherence is automatic - no sync needed!
+// Memory coherence is automatic - no explicit sync needed!
 // Works on AMD, NVIDIA, Intel - anything with Vulkan</code></pre>
                     </div>
                 </div>
