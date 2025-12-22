@@ -539,39 +539,42 @@ body {
 .performance-table table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    background: var(--bg-primary);
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    border: 1px solid var(--border-color);
 }
 
 .performance-table thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    color: var(--text-primary);
 }
 
 .performance-table th,
 .performance-table td {
     padding: 1rem;
     text-align: left;
+    color: var(--text-primary);
 }
 
 .performance-table tbody tr {
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
     transition: background 0.2s ease;
 }
 
 .performance-table tbody tr:hover {
-    background: #f7fafc;
+    background: var(--bg-secondary);
 }
 
 .performance-table tbody tr.highlight {
-    background: #fef5e7;
+    background: var(--bg-secondary);
     font-weight: 600;
+    border-left: 3px solid var(--accent-success);
 }
 
 .performance-table tbody tr.highlight:hover {
-    background: #fdebd0;
+    background: var(--bg-terminal);
 }
 
 .cta-performance {
