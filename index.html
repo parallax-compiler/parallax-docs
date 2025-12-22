@@ -103,30 +103,74 @@ std::for_each(std::execution::par,
 
     <section class="performance">
         <div class="container">
-            <h2>Performance</h2>
-            <p class="section-subtitle">Early benchmarks on vector operations (1M elements)</p>
+            <h2>Performance Results</h2>
+            <p class="section-subtitle">Production benchmarks on NVIDIA GTX 980M (December 2025)</p>
 
-            <div class="benchmark-grid">
-                <div class="benchmark-card">
-                    <div class="benchmark-label">CPU (12-core)</div>
-                    <div class="benchmark-bar" style="width: 100%;">
-                        <span>85ms</span>
-                    </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">744M</div>
+                    <div class="stat-label">Elements/sec (std::for_each)</div>
+                    <div class="stat-detail">1M element dataset</div>
                 </div>
-                <div class="benchmark-card">
-                    <div class="benchmark-label">NVIDIA RTX 4090</div>
-                    <div class="benchmark-bar speedup" style="width: 2.5%;">
-                        <span>2.1ms</span>
-                    </div>
-                    <div class="speedup-badge">40x faster</div>
+                <div class="stat-card">
+                    <div class="stat-number">732M</div>
+                    <div class="stat-label">Elements/sec (std::transform)</div>
+                    <div class="stat-detail">1M element dataset</div>
                 </div>
-                <div class="benchmark-card">
-                    <div class="benchmark-label">AMD RX 7900 XTX</div>
-                    <div class="benchmark-bar speedup" style="width: 3.3%;">
-                        <span>2.8ms</span>
-                    </div>
-                    <div class="speedup-badge">30x faster</div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Test Pass Rate</div>
+                    <div class="stat-detail">47/47 conformance tests</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Source Changes</div>
+                    <div class="stat-detail">Pure ISO C++20</div>
+                </div>
+            </div>
+
+            <div class="performance-table">
+                <h3>Throughput by Dataset Size</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dataset Size</th>
+                            <th>std::for_each</th>
+                            <th>std::transform</th>
+                            <th>Efficiency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1K elements</td>
+                            <td>0.18 M/s</td>
+                            <td>0.38 M/s</td>
+                            <td>Low (overhead)</td>
+                        </tr>
+                        <tr>
+                            <td>10K elements</td>
+                            <td>36.77 M/s</td>
+                            <td>36.63 M/s</td>
+                            <td>Good</td>
+                        </tr>
+                        <tr>
+                            <td>100K elements</td>
+                            <td>228 M/s</td>
+                            <td>243 M/s</td>
+                            <td>Excellent</td>
+                        </tr>
+                        <tr class="highlight">
+                            <td><strong>1M elements</strong></td>
+                            <td><strong>744 M/s</strong></td>
+                            <td><strong>732 M/s</strong></td>
+                            <td><strong>Excellent</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="cta-performance">
+                <a href="content/results.html" class="btn btn-primary">View Full Benchmark Results</a>
             </div>
         </div>
     </section>
