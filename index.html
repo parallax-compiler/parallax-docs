@@ -57,14 +57,15 @@
                         <span class="terminal-title">parallax_demo.cpp</span>
                     </div>
                     <div class="terminal-body">
-                        <pre><code class="language-cpp">// Use parallax::allocator for GPU-accessible memory
-std::vector&lt;float, parallax::allocator&lt;float&gt;&gt; data(1'000'000, 1.0f);
+                        <pre><code class="language-cpp">// Standard C++ vector - no custom allocator needed!
+std::vector&lt;float&gt; data(1'000'000, 1.0f);
 
 // Just use std::execution::par - runs on GPU automatically!
 std::for_each(std::execution::par,
               data.begin(), data.end(),
               [](float& x) { x *= 2.0f; });
 
+// Compiler auto-injects GPU allocators - 100% ISO C++20!
 // Memory coherence is automatic - no explicit sync needed!
 // Works on AMD, NVIDIA, Intel - anything with Vulkan</code></pre>
                     </div>
@@ -90,7 +91,12 @@ std::for_each(std::execution::par,
                 <div class="feature-card">
                     <div class="feature-icon">🧠</div>
                     <h3>Smart Memory</h3>
-                    <p>Unified memory with automatic host-device synchronization</p>
+                    <p>Automatic allocator injection - compiler handles GPU-accessible memory for you</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✨</div>
+                    <h3>100% Standard C++</h3>
+                    <p>Pure ISO C++20 - no custom allocators, no extensions, no vendor lock-in</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🔓</div>
