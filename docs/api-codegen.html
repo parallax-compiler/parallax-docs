@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Generation - Parallax API</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/docs.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+    <style>
+        .flow-diagram {
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .flow-step {
+            background: white;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .flow-step h4 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        .transformation-box {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .before-code, .after-code {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .arrow {
+            font-size: 2em;
+            color: #4CAF50;
+            text-align: center;
+        }
+        .pattern-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .spirv-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">
+                    <span class="terminal-prompt">~$</span> Parallax
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html#features">Features</a>
+                <a href="quickstart.html">Quick Start</a>
+                <a href="api.html">API</a>
+                <a href="examples.html">Examples</a>
+                <a href="validation.html">Validation</a>
+                <a href="https://github.com/parallax-compiler" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="docs-container">
+        <aside class="docs-sidebar">
+            <nav class="docs-nav">
+                <div class="nav-section">
+                    <h3>Getting Started</h3>
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="installation.html">Installation</a>
+                    <a href="first-app.html">First Application</a>
+                </div>
+                <div class="nav-section">
+                    <h3>API Reference</h3>
+                    <a href="api.html">Overview</a>
+                    <a href="api-memory.html">Memory Management</a>
+                    <a href="api-kernels.html">Kernel Execution</a>
+                    <a href="api-codegen.html" class="active">Code Generation</a>
+                </div>
+                <div class="nav-section">
+                    <h3>Validation</h3>
+                    <a href="validation.html">Unified Memory Tests</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="docs-content">
+            <h1>Automatic Code Generation</h1>
+            <p class="lead">How Parallax automatically transforms C++ code for GPU execution</p>
+
+            <section class="doc-section">
+                <h2>Overview</h2>
+                <p>
+                    Parallax uses a Clang compiler plugin to automatically transform standard C++ parallel algorithms
+                    into GPU-accelerated code. The transformation happens at compile-time through three main phases:
+                </p>
+                <ol>
+                    <li><strong>Pattern Detection:</strong> Identify parallel algorithms and trace pointer patterns</li>
+                    <li><strong>Allocator Injection:</strong> Automatically inject GPU-compatible allocators</li>
+                    <li><strong>SPIR-V Generation:</strong> Compile lambda/functor to GPU code</li>
+                </ol>
+            </section>
+
+            <section class="doc-section">
+                <h2>Compilation Flow</h2>
+
+                <div class="flow-diagram">
+                    <div class="flow-step">
+                        <h4>Phase 1: Source Analysis</h4>
+                        <p>The plugin performs AST traversal to detect:</p>
+                        <ul>
+                            <li><code>std::for_each</code>, <code>std::transform</code> with <code>std::execution::par</code></li>
+                            <li>Containers used with parallel algorithms</li>
+                            <li>Iterator and pointer patterns</li>
+                        </ul>
+                    </div>
+
+                    <div class="flow-step">
+                        <h4>Phase 2: Allocator Injection</h4>
+                        <p>Containers are rewritten to use <code>parallax::allocator</code>:</p>
+                        <div class="transformation-box">
+                            <div class="before-code">
+std::vector&lt;float&gt; data(1000);
+                            </div>
+                            <div class="arrow">→</div>
+                            <div class="after-code">
+std::vector&lt;float,<br>
+  parallax::allocator&lt;float&gt;&gt;<br>
+  data(1000);
+                            </div>
+                        </div>
+                        <p>Header automatically injected: <code>#include &lt;parallax/allocator.hpp&gt;</code></p>
+                    </div>
+
+                    <div class="flow-step">
+                        <h4>Phase 3: Runtime Header Injection</h4>
+                        <p>When GPU kernels are detected, the runtime header is automatically added:</p>
+                        <pre style="background: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px;"><code>#include &lt;parallax/runtime.h&gt;</code></pre>
+                    </div>
+
+                    <div class="flow-step">
+                        <h4>Phase 4: Lambda/Functor Extraction</h4>
+                        <p>The plugin extracts the lambda or function object's <code>operator()</code>:</p>
+                        <ul>
+                            <li>Generates LLVM IR from the function body</li>
+                            <li>Compiles IR to SPIR-V (Vulkan compute shader)</li>
+                            <li>Embeds SPIR-V directly in the source as static array</li>
+                        </ul>
+                    </div>
+
+                    <div class="flow-step">
+                        <h4>Phase 5: Kernel Launch Code Injection</h4>
+                        <p>Replaces the original algorithm call with GPU kernel launch:</p>
+                        <div class="transformation-box">
+                            <div class="before-code" style="grid-column: span 3;">
+// Original code
+std::for_each(std::execution::par,<br>
+              data.begin(), data.end(),<br>
+              [](float& x) { x *= 2.0f; });
+                            </div>
+                        </div>
+                        <div style="text-align: center; font-size: 1.5em; color: #4CAF50;">↓</div>
+                        <div class="transformation-box">
+                            <div class="after-code" style="grid-column: span 3;">
+// Generated code
+static const uint32_t spirv[] = { /* 223 words */ };<br>
+static parallax_kernel_t kernel = nullptr;<br>
+if (!kernel) {<br>
+  kernel = parallax_kernel_load(spirv, 223);<br>
+}<br>
+size_t count = std::distance(data.begin(), data.end());<br>
+auto ptr = &(*data.begin());<br>
+parallax_kernel_launch(kernel, ptr, count);
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Pointer Pattern Detection</h2>
+                <p>
+                    Parallax automatically traces various iterator and pointer patterns back to their source containers.
+                    This enables correct allocator injection even for complex code patterns.
+                </p>
+
+                <div class="pattern-card">
+                    <h3>Pattern 1: Container Member Calls</h3>
+                    <pre style="background: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px;"><code>std::vector&lt;float&gt; vec(1000);
+std::for_each(std::execution::par, vec.begin(), vec.end(), lambda);</code></pre>
+                    <p><strong>Detection:</strong></p>
+                    <ul>
+                        <li>Identify <code>vec.begin()</code> as <code>CXXMemberCallExpr</code></li>
+                        <li>Extract implicit object argument → <code>vec</code></li>
+                        <li>Mark <code>vec</code> for allocator injection</li>
+                    </ul>
+                </div>
+
+                <div class="pattern-card">
+                    <h3>Pattern 2: Free Function Calls</h3>
+                    <pre style="background: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px;"><code>std::vector&lt;float&gt; vec(1000);
+std::for_each(std::execution::par, std::begin(vec), std::end(vec), lambda);</code></pre>
+                    <p><strong>Detection:</strong></p>
+                    <ul>
+                        <li>Identify <code>std::begin()</code> call</li>
+                        <li>Extract first argument → <code>vec</code></li>
+                        <li>Mark <code>vec</code> for allocator injection</li>
+                    </ul>
+                </div>
+
+                <div class="pattern-card">
+                    <h3>Pattern 3: Raw Pointers from .data()</h3>
+                    <pre style="background: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px;"><code>std::vector&lt;float&gt; vec(1000);
+float* ptr = vec.data();
+std::for_each(std::execution::par, ptr, ptr + 1000, lambda);</code></pre>
+                    <p><strong>Detection:</strong></p>
+                    <ul>
+                        <li>Identify <code>ptr</code> as pointer type</li>
+                        <li>Trace through member call <code>vec.data()</code></li>
+                        <li>Extract implicit object → <code>vec</code></li>
+                        <li>Mark <code>vec</code> for allocator injection</li>
+                    </ul>
+                </div>
+
+                <div class="pattern-card">
+                    <h3>Pattern 4: Direct Pointer Variables</h3>
+                    <pre style="background: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px;"><code>std::vector&lt;CellData&gt; lattice_vect(size);
+CellData* lattice = &lattice_vect[0];
+std::for_each(std::execution::par, lattice, lattice + size, functor);</code></pre>
+                    <p><strong>Detection:</strong></p>
+                    <ul>
+                        <li>Identify <code>lattice</code> as pointer variable</li>
+                        <li>Trace initialization: <code>&lattice_vect[0]</code></li>
+                        <li>Follow through array subscript to <code>lattice_vect</code></li>
+                        <li>Mark <code>lattice_vect</code> for allocator injection</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>SPIR-V Generation</h2>
+
+                <div class="spirv-box">
+                    <h3>Lambda to SPIR-V Compilation</h3>
+                    <p>The plugin extracts lambda bodies and compiles them to Vulkan SPIR-V:</p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <span class="code-file">Source Lambda</span>
+                    </div>
+                    <pre><code class="language-cpp">[](float& x) { x *= 2.0f; }</code></pre>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="font-size: 1.5em; color: #2196F3;">↓ LLVM IR Generation ↓</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">LLVM IR</span>
+                        <span class="code-file">Intermediate Representation</span>
+                    </div>
+                    <pre><code>define void @lambda(float* %x) {
+entry:
+  %0 = load float, float* %x
+  %1 = fmul float %0, 2.0
+  store float %1, float* %x
+  ret void
+}</code></pre>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="font-size: 1.5em; color: #2196F3;">↓ SPIR-V Backend ↓</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">SPIR-V</span>
+                        <span class="code-file">Vulkan Compute Shader (223 words)</span>
+                    </div>
+                    <pre><code>static const uint32_t __parallax_kernel_spirv[] = {
+  0x07230203, 0x00010500, 0x000d000b, 0x00000029, ...
+  // 223 words total (892 bytes)
+};</code></pre>
+                </div>
+
+                <div class="info-box" style="margin-top: 20px;">
+                    <strong>SPIR-V Features:</strong>
+                    <ul>
+                        <li>Standard Vulkan compute shader format</li>
+                        <li>Compiled once, cached for future invocations</li>
+                        <li>Typical size: 150-300 words for simple lambdas</li>
+                        <li>Validated before GPU execution</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Runtime Execution</h2>
+
+                <h3>Kernel Load</h3>
+                <p>When the generated code first executes:</p>
+                <pre style="background: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px;"><code>parallax_kernel_t kernel = parallax_kernel_load(spirv, word_count);</code></pre>
+                <ul>
+                    <li>Creates Vulkan shader module from SPIR-V</li>
+                    <li>Sets up compute pipeline</li>
+                    <li>Creates descriptor set layout for buffer bindings</li>
+                    <li>Returns opaque kernel handle</li>
+                    <li>Cached for subsequent calls (loaded only once)</li>
+                </ul>
+
+                <h3>Kernel Launch</h3>
+                <p>For each parallel algorithm invocation:</p>
+                <pre style="background: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px;"><code>parallax_kernel_launch(kernel, buffer_ptr, element_count);</code></pre>
+
+                <div class="flow-diagram">
+                    <div class="flow-step">
+                        <h4>1. Memory Synchronization (if needed)</h4>
+                        <p>If CPU has modified the buffer since last GPU access:</p>
+                        <ul>
+                            <li>Identify dirty blocks using block-level tracking</li>
+                            <li>Copy only modified blocks to GPU (CPU → GPU)</li>
+                        </ul>
+                        <p><em>If data already on GPU (previous kernel): Skip copy!</em></p>
+                    </div>
+
+                    <div class="flow-step">
+                        <h4>2. Descriptor Set Binding</h4>
+                        <ul>
+                            <li>Check descriptor set cache</li>
+                            <li>If cached: Reuse existing descriptor set</li>
+                            <li>If not cached: Allocate and bind buffer</li>
+                        </ul>
+                    </div>
+
+                    <div class="flow-step">
+                        <h4>3. Compute Dispatch</h4>
+                        <ul>
+                            <li>Calculate workgroup count: <code>(count + 255) / 256</code></li>
+                            <li>Record command buffer with kernel dispatch</li>
+                            <li>Submit to GPU compute queue</li>
+                            <li>Wait for completion (fence synchronization)</li>
+                        </ul>
+                    </div>
+
+                    <div class="flow-step">
+                        <h4>4. Post-Kernel State</h4>
+                        <ul>
+                            <li>Mark buffer as GPU-dirty</li>
+                            <li>Data remains on GPU (zero-copy for next kernel)</li>
+                            <li>CPU access will trigger automatic GPU → CPU sync</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Performance Characteristics</h2>
+
+                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                    <thead>
+                        <tr style="background: #4CAF50; color: white;">
+                            <th style="padding: 10px; text-align: left;">Operation</th>
+                            <th style="padding: 10px; text-align: right;">Time (ms)</th>
+                            <th style="padding: 10px; text-align: left;">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #f9f9f9;">
+                            <td style="padding: 10px;">Lambda IR generation</td>
+                            <td style="padding: 10px; text-align: right;">~150</td>
+                            <td style="padding: 10px;">Compile-time (once per build)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">SPIR-V generation</td>
+                            <td style="padding: 10px; text-align: right;">~50</td>
+                            <td style="padding: 10px;">Compile-time (once per build)</td>
+                        </tr>
+                        <tr style="background: #f9f9f9;">
+                            <td style="padding: 10px;">First kernel load</td>
+                            <td style="padding: 10px; text-align: right;">~5</td>
+                            <td style="padding: 10px;">Runtime (cached afterward)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">Kernel launch (cached)</td>
+                            <td style="padding: 10px; text-align: right;">~0.1</td>
+                            <td style="padding: 10px;">Per invocation</td>
+                        </tr>
+                        <tr style="background: #f9f9f9;">
+                            <td style="padding: 10px;">GPU execution (1M floats)</td>
+                            <td style="padding: 10px; text-align: right;">~0.5</td>
+                            <td style="padding: 10px;">Workload-dependent</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">Memory sync (4 MB)</td>
+                            <td style="padding: 10px; text-align: right;">~2</td>
+                            <td style="padding: 10px;">Only when needed</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <strong>Zero-Copy Optimization:</strong> When running multiple kernels in a loop without CPU access,
+                    Parallax keeps data on the GPU. No memory transfers occur between kernel launches, achieving
+                    optimal performance.
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Supported Patterns</h2>
+
+                <h3>Execution Policies</h3>
+                <ul>
+                    <li><code>std::execution::par</code> - Parallel execution (GPU)</li>
+                    <li><code>std::execution::par_unseq</code> - Parallel unsequenced (GPU)</li>
+                </ul>
+
+                <h3>Algorithms</h3>
+                <ul>
+                    <li><code>std::for_each</code> - Element-wise operations</li>
+                    <li><code>std::transform</code> - Element-wise transformations</li>
+                </ul>
+
+                <h3>Callable Types</h3>
+                <ul>
+                    <li><strong>Lambdas:</strong> <code>[](T& x) { ... }</code></li>
+                    <li><strong>Function Objects:</strong> <code>struct Functor { void operator()(T& x) { ... } };</code></li>
+                    <li><strong>Captures:</strong> Lambda captures passed via push constants</li>
+                </ul>
+
+                <h3>Data Types</h3>
+                <ul>
+                    <li><code>float</code> - 32-bit floating point (primary support)</li>
+                    <li>Custom structs (requires alignment considerations)</li>
+                </ul>
+            </section>
+
+            <section class="doc-section">
+                <h2>Example: Complete Flow</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <span class="code-file">Original Source</span>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;execution&gt;
+
+int main() {
+    std::vector&lt;float&gt; data(1000000, 1.0f);
+
+    std::for_each(std::execution::par, data.begin(), data.end(),
+                  [](float& x) { x *= 2.0f; });
+
+    return 0;
+}</code></pre>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0; font-size: 1.3em; color: #4CAF50;">
+                    ↓ Parallax Plugin Transformation ↓
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <span class="code-file">Generated Code (Conceptual)</span>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;parallax/runtime.h&gt;
+#include &lt;parallax/allocator.hpp&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;execution&gt;
+
+int main() {
+    // Allocator injected automatically
+    std::vector&lt;float, parallax::allocator&lt;float&gt;&gt; data(1000000, 1.0f);
+
+    // SPIR-V embedded
+    static const uint32_t spirv[] = { /* 223 words */ };
+    static parallax_kernel_t kernel = nullptr;
+
+    // Kernel loaded (once)
+    if (!kernel) {
+        kernel = parallax_kernel_load(spirv, 223);
+    }
+
+    // GPU execution
+    size_t count = 1000000;
+    auto ptr = data.data();
+    parallax_kernel_launch(kernel, ptr, count);
+
+    return 0;
+}</code></pre>
+                </div>
+
+                <p style="margin-top: 20px;">
+                    <strong>Result:</strong> Standard C++ code automatically executes on GPU with
+                    <strong style="color: #4CAF50;">190× speedup</strong> - no manual GPU programming required!
+                </p>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>
